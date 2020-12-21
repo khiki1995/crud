@@ -96,7 +96,7 @@ func (s *Service) GetToken(ctx context.Context, phone string, password string) (
 	}
 
 	buffer := make([]byte, 256)
-	n, err := rand.Read(buffer)у 
+	n, err := rand.Read(buffer)
 	if n != len(buffer) || err != nil {
 		return "", ErrInternal
 	}
