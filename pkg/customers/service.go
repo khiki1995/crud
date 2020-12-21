@@ -43,10 +43,6 @@ type Auth struct {
 	Password string `json:"password"`
 }
 
-type Token struct {
-	Token string `json:"token"`
-}
-
 type Product struct {
 	ID    int64  `json:"id"`
 	Name  string `json:"name"`

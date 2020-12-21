@@ -12,6 +12,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/khiki1995/crud/cmd/app"
 	"github.com/khiki1995/crud/pkg/customers"
+	"github.com/khiki1995/crud/pkg/managers"
 	"go.uber.org/dig"
 )
 
@@ -35,6 +36,7 @@ func execute(host string, port string, dsn string) (err error) {
 			return pgxpool.Connect(ctx, dsn)
 		},
 		customers.NewService,
+		managers.NewService,
 		func(server *app.Server) *http.Server {
 			return &http.Server{
 				Addr:    net.JoinHostPort(host, port),

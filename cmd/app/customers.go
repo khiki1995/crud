@@ -5,63 +5,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/khiki1995/crud/cmd/app/middleware"
 	"github.com/khiki1995/crud/pkg/customers"
 	"golang.org/x/crypto/bcrypt"
 )
-
-const (
-	GET    = "GET"
-	POST   = "POST"
-	DELETE = "DELETE"
-)
-
-type Server struct {
-	mux          *mux.Router
-	customersSvc *customers.Service
-}
-
-type Token struct {
-	Token string `json:"token"`
-}
-
-func NewServer(mux *mux.Router, customersSvc *customers.Service) *Server {
-	return &Server{mux: mux, customersSvc: customersSvc}
-}
-
-func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	s.mux.ServeHTTP(writer, request)
-}
-
-func responseJSON(w http.ResponseWriter, statusCode int, response interface{}) {
-	data, err := json.Marshal(response)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	_, err = w.Write(data)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-}
-
-func (s *Server) Init() {
-	customersAuthMW := middleware.Authenticate(s.customersSvc.IDByToken)
-
-	customersSR := s.mux.PathPrefix("/api/customers").Subrouter()
-	customersSR.Use(customersAuthMW)
-	customersSR.HandleFunc("", s.handleCustomerRegistration).Methods(POST)
-	customersSR.HandleFunc("/token", s.handleCustomerGetToken).Methods(POST)
-	customersSR.HandleFunc("/token/validate", s.handleCustomerValidateToken).Methods(POST)
-	//customersSR.HandleFunc("/purchases", s.handleCustomerMakePurchase).Methods(POST)
-
-	customersSR.HandleFunc("/products", s.handleCustomerGetProducts).Methods(GET)
-	customersSR.HandleFunc("/purchases", s.handleCustomerGetPurchases).Methods(GET)
-}
 
 func (s *Server) handleCustomerRegistration(writer http.ResponseWriter, request *http.Request) {
 	var item *customers.Registration
@@ -100,7 +47,7 @@ func (s *Server) handleCustomerGetToken(writer http.ResponseWriter, request *htt
 	responseJSON(writer, 200, map[string]string{"token": token})
 }
 func (s *Server) handleCustomerValidateToken(writer http.ResponseWriter, request *http.Request) {
-	var token Token
+	var token middleware.Token
 	response := make(map[string]interface{})
 	err := json.NewDecoder(request.Body).Decode(&token)
 	if err != nil {
