@@ -8,10 +8,11 @@ CREATE TABLE customers
     active BOOLEAN NOT NULL DEFAULT TRUE,
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
 CREATE TABLE customers_tokens
 (
     token TEXT NOT NULL UNIQUE,
-    customer_id BIGINT NOT NULL REFERENCES customers ON DELETE CASCADE,
+    customer_id BIGINT NOT NULL REFERENCES customers (id) ON DELETE CASCADE,
     expire TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP + INTERVAL '1 hour',
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -26,7 +27,7 @@ CREATE TABLE managers
     department TEXT,
     phone TEXT NOT NULL UNIQUE,
     password TEXT,
-    roles   TEXT[] NOT NULL DEFAULT '{}'
+    roles   TEXT[] NOT NULL DEFAULT '{}',
     active BOOLEAN NOT NULL DEFAULT TRUE,
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -52,16 +53,16 @@ CREATE TABLE sales
 (
     id          BIGSERIAL PRIMARY KEY,
     manager_id  BIGINT NOT NULL REFERENCES managers,
-    customer_id BIGINT NOT NULL ON DELETE CASCADE,
+    customer_id BIGINT NOT NULL,
     created     timestamp NOT NULL default current_timestamp 
 );
 
 CREATE TABLE sales_positions 
 (
     id          BIGSERIAL PRIMARY KEY,
-    product_id  BIGINT NOT NULL REFERENCES products ON DELETE CASCADE,
-    sale_id     BIGINT NOT NULL REFERENCES sales ON DELETE CASCADE,
+    product_id  BIGINT NOT NULL REFERENCES products (id) ON DELETE CASCADE,
+    sale_id     BIGINT NOT NULL REFERENCES sales (id) ON DELETE CASCADE,
     price       INTEGER NOT NULL,
     qty         INTEGER NOT NULL,
     created     timestamp NOT NULL default current_timestamp 
-)
+);
