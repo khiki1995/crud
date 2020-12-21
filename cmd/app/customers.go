@@ -39,7 +39,7 @@ func (s *Server) handleCustomerGetToken(writer http.ResponseWriter, request *htt
 		http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	token, err := s.customersSvc.Token(request.Context(), auth.Login, auth.Password)
+	token, err := s.customersSvc.GetToken(request.Context(), auth.Login, auth.Password)
 	if err != nil {
 		http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
@@ -47,7 +47,7 @@ func (s *Server) handleCustomerGetToken(writer http.ResponseWriter, request *htt
 	responseJSON(writer, 200, map[string]string{"token": token})
 }
 func (s *Server) handleCustomerValidateToken(writer http.ResponseWriter, request *http.Request) {
-	var token middleware.Token
+	var token Token
 	response := make(map[string]interface{})
 	err := json.NewDecoder(request.Body).Decode(&token)
 	if err != nil {

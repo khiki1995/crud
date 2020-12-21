@@ -14,10 +14,6 @@ type contextKey struct {
 	name string
 }
 
-type Token struct {
-	Token string `json:"token"`
-}
-
 func (c *contextKey) String() string {
 	return c.name
 }

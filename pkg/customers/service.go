@@ -44,10 +44,12 @@ type Auth struct {
 }
 
 type Product struct {
-	ID    int64  `json:"id"`
-	Name  string `json:"name"`
-	Price int    `json:"price"`
-	Qty   int    `json:"qty"`
+	ID    	int64  		`json:"id"`
+	Name  	string 		`json:"name"`
+	Price 	int    		`json:"price"`
+	Qty   	int    		`json:"qty"`
+	Active 	bool  		`json:"active"`
+	Created time.Time 	`json:"created"`
 }
 
 type Purchase struct {
@@ -59,7 +61,7 @@ func NewService(pool *pgxpool.Pool) *Service {
 	return &Service{pool: pool}
 }
 
-func (s *Service) Token(ctx context.Context, phone string, password string) (token string, err error) {
+func (s *Service) GetToken(ctx context.Context, phone string, password string) (token string, err error) {
 	var hash string
 	var id int64
 	err = s.pool.QueryRow(ctx, `SELECT id, password FROM customers WHERE phone = $1`, phone).Scan(&id, &hash)
@@ -90,9 +92,10 @@ func (s *Service) Token(ctx context.Context, phone string, password string) (tok
 }
 
 func (s *Service) IDByToken(ctx context.Context, token string) (id int64, err error) {
+	expireTime := time.Now()
 	err = s.pool.QueryRow(ctx, `
-		SELECT customer_id FROM customers_tokens WHERE token = $1
-	`, token).Scan(&id)
+		SELECT customer_id, expire  FROM customers_tokens WHERE token = $1
+	`, token).Scan(&id, &expireTime)
 
 	if err == pgx.ErrNoRows {
 		return 0, nil
@@ -101,7 +104,9 @@ func (s *Service) IDByToken(ctx context.Context, token string) (id int64, err er
 	if err != nil {
 		return 0, ErrInternal
 	}
-
+	if time.Now().After(expireTime) {
+		return 0, ErrTokenExpired
+	}
 	return id, nil
 }
 
@@ -169,10 +174,11 @@ func (s *Service) Products(ctx context.Context) ([]*Product, error) {
 func (s *Service) Purchases(ctx context.Context, id int64) ([]*Purchase, error) {
 	items := make([]*Purchase, 0)
 	rows, err := s.pool.Query(ctx, `
-		SELECT s.created as Date, sp.product_id as ID, sp.name as Name, sp.price as Price, sp.qty as Qty
+		SELECT s.created as Date, sp.product_id as ID, p.name as Name, sp.price as Price, sp.qty as Qty
 		FROM sales s
 		INNER JOIN sale_positions sp ON sp.sale_id = s.id and s.customer_id = $1
-		GROUP BY s.id, sp.product_id, sp.name, sp.price, sp.qty
+		LEFT JOIN products p ON sp.product_id = p.id
+		GROUP BY s.id, sp.product_id, p.name, sp.price, sp.qty
 		ORDER BY s.created
 	`, id)
 	if errors.Is(err, pgx.ErrNoRows) {

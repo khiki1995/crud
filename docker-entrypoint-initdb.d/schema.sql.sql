@@ -11,7 +11,7 @@ CREATE TABLE customers
 CREATE TABLE customers_tokens
 (
     token TEXT NOT NULL UNIQUE,
-    customer_id BIGINT NOT NULL REFERENCES customers on delete cascade,
+    customer_id BIGINT NOT NULL REFERENCES customers ON DELETE CASCADE,
     expire TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP + INTERVAL '1 hour',
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -24,8 +24,9 @@ CREATE TABLE managers
     plan INTEGER NOT NULL  DEFAULT 0,
     boss_id BIGINT REFERENCES managers,
     department TEXT,
-    login TEXT NOT NULL UNIQUE,
+    phone TEXT NOT NULL UNIQUE,
     password TEXT,
+    roles   TEXT[] NOT NULL DEFAULT '{}'
     active BOOLEAN NOT NULL DEFAULT TRUE,
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -35,19 +36,32 @@ CREATE TABLE managers_tokens
     manager_id BIGINT NOT NULL REFERENCES managers,
     expire TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP + INTERVAL '1 hour',
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-)
-
-create table if not exists sales 
-(
-    id          bigserial primary key,
-    manager_id  bigint not null references managers,
-    customer_id bigint not null,
-    created     timestamp not null default current_timestamp 
 );
 
--- SELECT conname
--- FROM pg_constraint
--- WHERE
---   conrelid = 'sales'::regclass 
+CREATE TABLE products
+(
+    id    BIGSERIAL PRIMARY KEY,
+    name  TEXT NOT NULL,
+    price INTEGER NOT NULL DEFAULT 0,
+    qty   INTEGER NOT NULL DEFAULT 0,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 
--- ALTER TABLE sales DROP CONSTRAINT sales_customer_id_fkey;
+CREATE TABLE sales 
+(
+    id          BIGSERIAL PRIMARY KEY,
+    manager_id  BIGINT NOT NULL REFERENCES managers,
+    customer_id BIGINT NOT NULL ON DELETE CASCADE,
+    created     timestamp NOT NULL default current_timestamp 
+);
+
+CREATE TABLE sales_positions 
+(
+    id          BIGSERIAL PRIMARY KEY,
+    product_id  BIGINT NOT NULL REFERENCES products ON DELETE CASCADE,
+    sale_id     BIGINT NOT NULL REFERENCES sales ON DELETE CASCADE,
+    price       INTEGER NOT NULL,
+    qty         INTEGER NOT NULL,
+    created     timestamp NOT NULL default current_timestamp 
+)
