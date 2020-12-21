@@ -35,7 +35,7 @@ type Manager struct {
 	Plan        string    `json:"plan"`
 	Boss_id     int64     `json:"boss_id"`
 	Departament string    `json:"departament"`
-	Phone       string    `json:"login"`
+	Phone       string    `json:"phone"`
 	Password    string    `json:"password"`
 	Roles       []string  `json:"roles"`
 	Active      bool      `json:"active"`
