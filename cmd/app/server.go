@@ -37,9 +37,9 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 }
 
 func (s *Server) Init() {
-//	customersAuth := middleware.Authenticate(s.customersSvc.IDByToken)
+	customersAuth := middleware.Authenticate(s.customersSvc.IDByToken)
 	customersSR := s.mux.PathPrefix("/api/customers").Subrouter()
-//	customersSR.Use(customersAuth)
+	customersSR.Use(customersAuth)
 	customersSR.HandleFunc("", s.handleCustomerRegistration).Methods(POST)
 	customersSR.HandleFunc("/token", s.handleCustomerGetToken).Methods(POST)
 	customersSR.HandleFunc("/token/validate", s.handleCustomerValidateToken).Methods(POST)
