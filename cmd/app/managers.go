@@ -35,7 +35,7 @@ func (s *Server) handleManagerRegistration(writer http.ResponseWriter, request *
 
 func (s *Server) handleManagerGetToken(writer http.ResponseWriter, request *http.Request) {
 	var manager *managers.Manager
-	err := json.NewDecoder(r.Body).Decode(&manager)
+	err := json.NewDecoder(request.Body).Decode(&manager)
 
 	if err != nil {
 		http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -47,7 +47,7 @@ func (s *Server) handleManagerGetToken(writer http.ResponseWriter, request *http
 		http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	respondJSON(w, map[string]interface{}{"token": tkn})
+	responseJSON(writer,200, map[string]interface{}{"token": token})
 }
 
 func (s *Server) handleManagerChangeProduct(writer http.ResponseWriter, request *http.Request) {
