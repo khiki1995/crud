@@ -34,19 +34,20 @@ func (s *Server) handleManagerRegistration(writer http.ResponseWriter, request *
 }
 
 func (s *Server) handleManagerGetToken(writer http.ResponseWriter, request *http.Request) {
-	var auth *managers.Auth
-	err := json.NewDecoder(request.Body).Decode(&auth)
+	var manager *managers.Manager
+	err := json.NewDecoder(r.Body).Decode(&manager)
+
 	if err != nil {
-		log.Print(err)
 		http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	token, err := s.managersSvc.GetToken(request.Context(), auth.Login, auth.Password)
+
+	token, err := s.managersSvc.GetToken(request.Context(), manager.Phone, manager.Password)
 	if err != nil {
 		http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	responseJSON(writer, 200, Token{Token: token})
+	respondJSON(w, map[string]interface{}{"token": tkn})
 }
 
 func (s *Server) handleManagerChangeProduct(writer http.ResponseWriter, request *http.Request) {
