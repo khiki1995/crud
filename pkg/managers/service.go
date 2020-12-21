@@ -323,7 +323,7 @@ func (s *Service) RemoveCustomerByID(ctx context.Context, id int64) (*customers.
 func (s *Service) IsAdmin(ctx context.Context, id int64) (bool){
 	err := s.pool.QueryRow(ctx,`
 		select id from managers where 'ADMIN' =  any (roles) and id = $1
-	`, id)
+	`, id).Scan(&id)
 	if err != nil {
 		return false
 	}
