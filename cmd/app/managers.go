@@ -14,14 +14,17 @@ import (
 
 func (s *Server) handleManagerRegistration(writer http.ResponseWriter, request *http.Request) {
 	var reg *managers.Registration
-	_, err := middleware.Authentication(request.Context())
+	id, err := middleware.Authentication(request.Context())
 	if err != nil {
 		http.Error(writer, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
+	if !s.managersSvc.IsAdmin(request.Context(), id) {
+		http.Error(writer, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+		return
+	}
 	err = json.NewDecoder(request.Body).Decode(&reg)
 	if err != nil {
-		log.Print(err)
 		http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -30,7 +33,7 @@ func (s *Server) handleManagerRegistration(writer http.ResponseWriter, request *
 		http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	responseJSON(writer, 200, Token{Token:token})
+	responseJSON(writer, 200, Token{Token: token})
 }
 
 func (s *Server) handleManagerGetToken(writer http.ResponseWriter, request *http.Request) {
@@ -47,7 +50,7 @@ func (s *Server) handleManagerGetToken(writer http.ResponseWriter, request *http
 		http.Error(writer, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	responseJSON(writer,200, map[string]interface{}{"token": token})
+	responseJSON(writer, 200, map[string]interface{}{"token": token})
 }
 
 func (s *Server) handleManagerChangeProduct(writer http.ResponseWriter, request *http.Request) {
@@ -57,7 +60,7 @@ func (s *Server) handleManagerChangeProduct(writer http.ResponseWriter, request 
 		http.Error(writer, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
-	
+
 	err = json.NewDecoder(request.Body).Decode(&product)
 	if err != nil {
 		http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -101,7 +104,7 @@ func (s *Server) handleManagerMakeSale(writer http.ResponseWriter, request *http
 	responseJSON(writer, 200, item)
 }
 
-func (s *Server) handleManagerGetSales(writer http.ResponseWriter, request *http.Request) {	
+func (s *Server) handleManagerGetSales(writer http.ResponseWriter, request *http.Request) {
 	id, err := middleware.Authentication(request.Context())
 	if err != nil {
 		http.Error(writer, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
@@ -134,13 +137,13 @@ func (s *Server) handleManagerGetProducts(writer http.ResponseWriter, request *h
 	responseJSON(writer, 200, products)
 }
 
-func (s *Server) handleManagerRemoveProductByID(writer http.ResponseWriter, request *http.Request){
+func (s *Server) handleManagerRemoveProductByID(writer http.ResponseWriter, request *http.Request) {
 	_, err := middleware.Authentication(request.Context())
 	if err != nil {
 		http.Error(writer, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
-	
+
 	idParam, ok := mux.Vars(request)["id"]
 	if !ok {
 		http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -201,13 +204,13 @@ func (s *Server) handleManagerGetCustomers(writer http.ResponseWriter, request *
 	responseJSON(writer, 200, customers)
 }
 
-func (s *Server) handleManagerRemoveCustomerByID(writer http.ResponseWriter, request *http.Request){
+func (s *Server) handleManagerRemoveCustomerByID(writer http.ResponseWriter, request *http.Request) {
 	_, err := middleware.Authentication(request.Context())
 	if err != nil {
 		http.Error(writer, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
-	
+
 	idParam, ok := mux.Vars(request)["id"]
 	if !ok {
 		http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
