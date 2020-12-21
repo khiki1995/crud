@@ -1,0 +1,99 @@
+### получить покупателя по ID
+GET http://localhost:9999/customers.getById?id=2
+
+### удаление покупателя
+GET http://localhost:9999/customers.removeById?id=1
+
+### блокировка покупателя
+POST http://localhost:9999/customers/1/block
+
+### разблокировка покупателя
+DELETE http://localhost:9999/customers/1/block
+
+### регистрация покупателя
+POST http://localhost:9999/api/customers
+content-type: application/json
+
+{
+    "name": "Me",
+    "phone": "900000001",
+    "password": "secret"
+}
+### получить всех покупателей
+GET http://localhost:9999/customers
+content-type: application/json
+Authorization: Basic admin 1234
+
+### получение токена покупателю
+POST http://localhost:9999/api/customers/token
+content-type: application/json
+
+{
+    "login": "900000001",
+    "password": "secret"
+}
+
+### проверка токена на ошибки/истекший срок
+POST http://localhost:9999/api/customers/token/validate
+content-type: application/json
+
+{
+    "token": "2d700deb38d0ee626ac3fa63b809c03d73bc31625c9abe4fe320db93bb9896e75e21fddecf2739c162f4e0a52bcf10dde31266855590783bd94769a4fe5e1a5960a09e7b368b5f3ed3f284c4ac5ca582aa5f17314124b4e6f190afead63faed69c732927f037e70ffbef33425ed839f4f39531b2381bb222836af21f58de813c4e5635a7ff7b8c1dc27d6a9f4b7cd812edf60b17ca2ebd8d7e4678f7099701ebee8fb11b79ac8d333d509df368f5ce60310efbc3c5616f8ce4aebaa706842372bcc944275b2a3549774e3cbf19df490e118690c751d73d4784288fd991013ec8842eb49399e6a997142b6194d2d2e8c9fe23a5ddf85a3965f2aeb008ea7e6491"
+}
+
+### получение список покупков
+GET  http://localhost:9999/api/customers/purchases
+content-type: application/json
+Authorization: 2d700deb38d0ee626ac3fa63b809c03d73bc31625c9abe4fe320db93bb9896e75e21fddecf2739c162f4e0a52bcf10dde31266855590783bd94769a4fe5e1a5960a09e7b368b5f3ed3f284c4ac5ca582aa5f17314124b4e6f190afead63faed69c732927f037e70ffbef33425ed839f4f39531b2381bb222836af21f58de813c4e5635a7ff7b8c1dc27d6a9f4b7cd812edf60b17ca2ebd8d7e4678f7099701ebee8fb11b79ac8d333d509df368f5ce60310efbc3c5616f8ce4aebaa706842372bcc944275b2a3549774e3cbf19df490e118690c751d73d4784288fd991013ec8842eb49399e6a997142b6194d2d2e8c9fe23a5ddf85a3965f2aeb008ea7e6491
+
+### получение токена для менеджера
+POST http://localhost:9999/api/managers/token
+content-type: application/json
+
+{
+    "Login": "+992000000001",
+    "Password": "secret"
+}
+
+### регистрация менеджера
+POST http://localhost:9999/api/managers
+content-type: application/json
+Authorization: 2d700deb38d0ee626ac3fa63b809c03d73bc31625c9abe4fe320db93bb9896e75e21fddecf2739c162f4e0a52bcf10dde31266855590783bd94769a4fe5e1a5960a09e7b368b5f3ed3f284c4ac5ca582aa5f17314124b4e6f190afead63faed69c732927f037e70ffbef33425ed839f4f39531b2381bb222836af21f58de813c4e5635a7ff7b8c1dc27d6a9f4b7cd812edf60b17ca2ebd8d7e4678f7099701ebee8fb11b79ac8d333d509df368f5ce60310efbc3c5616f8ce4aebaa706842372bcc944275b2a3549774e3cbf19df490e118690c751d73d4784288fd991013ec8842eb49399e6a997142b6194d2d2e8c9fe23a5ddf85a3965f2aeb008ea7e6491
+
+{
+    "id": 0,
+    "name": "Katya",
+    "phone": "+992000000002",
+    "roles": ["MANAGER","ADMIN"]
+}
+
+### добавление/изменение товара
+POST http://localhost:9999/api/managers/products
+content-type: application/json
+Authorization: 2d700deb38d0ee626ac3fa63b809c03d73bc31625c9abe4fe320db93bb9896e75e21fddecf2739c162f4e0a52bcf10dde31266855590783bd94769a4fe5e1a5960a09e7b368b5f3ed3f284c4ac5ca582aa5f17314124b4e6f190afead63faed69c732927f037e70ffbef33425ed839f4f39531b2381bb222836af21f58de813c4e5635a7ff7b8c1dc27d6a9f4b7cd812edf60b17ca2ebd8d7e4678f7099701ebee8fb11b79ac8d333d509df368f5ce60310efbc3c5616f8ce4aebaa706842372bcc944275b2a3549774e3cbf19df490e118690c751d73d4784288fd991013ec8842eb49399e6a997142b6194d2d2e8c9fe23a5ddf85a3965f2aeb008ea7e6491
+
+{
+    "id": 0,
+    "name": "Phone",
+    "qty": 2,
+    "price": 500000
+}
+
+### продажа товара
+POST http://localhost:9999/api/managers/sales
+content-type: application/json
+Authorization: 2d700deb38d0ee626ac3fa63b809c03d73bc31625c9abe4fe320db93bb9896e75e21fddecf2739c162f4e0a52bcf10dde31266855590783bd94769a4fe5e1a5960a09e7b368b5f3ed3f284c4ac5ca582aa5f17314124b4e6f190afead63faed69c732927f037e70ffbef33425ed839f4f39531b2381bb222836af21f58de813c4e5635a7ff7b8c1dc27d6a9f4b7cd812edf60b17ca2ebd8d7e4678f7099701ebee8fb11b79ac8d333d509df368f5ce60310efbc3c5616f8ce4aebaa706842372bcc944275b2a3549774e3cbf19df490e118690c751d73d4784288fd991013ec8842eb49399e6a997142b6194d2d2e8c9fe23a5ddf85a3965f2aeb008ea7e6491
+
+{
+    "id": 0,
+    "customer_id": null,
+    "positions":[
+        {"id": 0,"product_id": 1,"qty": 2,"price": 500},
+        {"id": 0,"product_id": 2,"qty": 1,"price": 1000}
+    ]
+}
+
+### получить продажи менеджера
+GET http://localhost:9999/api/managers/sales
+content-type: application/json
+Authorization: 2d700deb38d0ee626ac3fa63b809c03d73bc31625c9abe4fe320db93bb9896e75e21fddecf2739c162f4e0a52bcf10dde31266855590783bd94769a4fe5e1a5960a09e7b368b5f3ed3f284c4ac5ca582aa5f17314124b4e6f190afead63faed69c732927f037e70ffbef33425ed839f4f39531b2381bb222836af21f58de813c4e5635a7ff7b8c1dc27d6a9f4b7cd812edf60b17ca2ebd8d7e4678f7099701ebee8fb11b79ac8d333d509df368f5ce60310efbc3c5616f8ce4aebaa706842372bcc944275b2a3549774e3cbf19df490e118690c751d73d4784288fd991013ec8842eb49399e6a997142b6194d2d2e8c9fe23a5ddf85a3965f2aeb008ea7e6491
