@@ -230,7 +230,7 @@ func (s *Service) MakeSale(ctx context.Context, sale *Sale) (*Sale, error) {
 func (s *Service) GetSales(ctx context.Context, id int64) (total int, err error) {
 	err = s.pool.QueryRow(ctx, `
 		SELECT COALESCE(SUM(sp.price * sp.qty),0) total
-		FROM manager m
+		FROM managers m
 		LEFT JOIN sales s on s.manager_id = $1
 		LEFT JOIN sales_positions sp ON sp.sale_id = s.id
 		GROUP BY m.id
