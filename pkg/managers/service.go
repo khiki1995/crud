@@ -199,6 +199,7 @@ func (s *Service) MakeSale(ctx context.Context, sale *Sale) (*Sale, error) {
 		RETURNING id, created
 		`, sale.Manager_id, sale.Customer_id).Scan(&sale.ID, &sale.Created)
 	if err != nil {
+		log.Print(err)
 		return nil, ErrInternal
 	}
 	positionsQuery := "INSERT INTO sale_positions(sale_id, product_id, qty, price) VALUES "
@@ -209,6 +210,7 @@ func (s *Service) MakeSale(ctx context.Context, sale *Sale) (*Sale, error) {
 
 	_, err = s.pool.Exec(ctx, positionsQuery)
 	if err != nil {
+		log.Print(err)
 		return nil, ErrInternal
 	}
 
@@ -320,8 +322,8 @@ func (s *Service) RemoveCustomerByID(ctx context.Context, id int64) (*customers.
 	return customer, nil
 }
 
-func (s *Service) IsAdmin(ctx context.Context, id int64) (bool){
-	err := s.pool.QueryRow(ctx,`
+func (s *Service) IsAdmin(ctx context.Context, id int64) bool {
+	err := s.pool.QueryRow(ctx, `
 		select id from managers where 'ADMIN' =  any (roles) and id = $1
 	`, id).Scan(&id)
 	if err != nil {
