@@ -236,6 +236,7 @@ func (s *Service) GetSales(ctx context.Context, id int64) (total int, err error)
 		GROUP BY m.id
 	`, id).Scan(&total)
 	if err != nil {
+		log.Print(err)
 		return 0, ErrInternal
 	}
 	return total, nil
