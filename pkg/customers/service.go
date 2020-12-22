@@ -44,12 +44,12 @@ type Auth struct {
 }
 
 type Product struct {
-	ID    	int64  		`json:"id"`
-	Name  	string 		`json:"name"`
-	Price 	int    		`json:"price"`
-	Qty   	int    		`json:"qty"`
-	Active 	bool  		`json:"active"`
-	Created time.Time 	`json:"created"`
+	ID      int64     `json:"id"`
+	Name    string    `json:"name"`
+	Price   int       `json:"price"`
+	Qty     int       `json:"qty"`
+	Active  bool      `json:"active"`
+	Created time.Time `json:"created"`
 }
 
 type Purchase struct {
@@ -176,7 +176,7 @@ func (s *Service) Purchases(ctx context.Context, id int64) ([]*Purchase, error) 
 	rows, err := s.pool.Query(ctx, `
 		SELECT s.created as Date, sp.product_id as ID, p.name as Name, sp.price as Price, sp.qty as Qty
 		FROM sales s
-		INNER JOIN sale_positions sp ON sp.sale_id = s.id and s.customer_id = $1
+		INNER JOIN sales_positions sp ON sp.sale_id = s.id and s.customer_id = $1
 		LEFT JOIN products p ON sp.product_id = p.id
 		GROUP BY s.id, sp.product_id, p.name, sp.price, sp.qty
 		ORDER BY s.created
