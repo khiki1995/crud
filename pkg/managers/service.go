@@ -202,7 +202,7 @@ func (s *Service) MakeSale(ctx context.Context, sale *Sale) (*Sale, error) {
 		log.Print(err)
 		return nil, ErrInternal
 	}
-	positionsQuery := "INSERT INTO sale_positions(sale_id, product_id, qty, price) VALUES "
+	positionsQuery := "INSERT INTO sales_positions(sale_id, product_id, qty, price) VALUES "
 	for _, v := range sale.Positions {
 		positionsQuery += "(" + strconv.FormatInt(sale.ID, 10) + "," + strconv.FormatInt(v.Product_id, 10) + "," + strconv.Itoa(v.Qty) + "," + strconv.Itoa(v.Price) + "),"
 	}
