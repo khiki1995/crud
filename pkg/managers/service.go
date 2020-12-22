@@ -196,6 +196,14 @@ func (s *Service) SaveProduct(ctx context.Context, product *Product) (*Product, 
 func (s *Service) MakeSale(ctx context.Context, sale *Sale) (*Sale, error) {
 	active := false
 	qty := 0
+	err := s.pool.QueryRow(ctx, `
+		INSERT INTO sales (manager_id, customer_id) VALUES ($1, $2)
+		RETURNING id, created
+		`, sale.Manager_id, sale.Customer_id).Scan(&sale.ID, &sale.Created)
+	if err != nil {
+		log.Print(err)
+		return nil, ErrInternal
+	}
 	positionsQuery := "INSERT INTO sales_positions(sale_id, product_id, qty, price) VALUES "
 	for _, v := range sale.Positions {
 		if err := s.pool.QueryRow(ctx, `SELECT qty, active from products where id = $1`, v.Product_id).Scan(&qty, &active); err != nil {
@@ -210,15 +218,6 @@ func (s *Service) MakeSale(ctx context.Context, sale *Sale) (*Sale, error) {
 		positionsQuery += "(" + strconv.FormatInt(sale.ID, 10) + "," + strconv.FormatInt(v.Product_id, 10) + "," + strconv.Itoa(v.Qty) + "," + strconv.Itoa(v.Price) + "),"
 	}
 	positionsQuery = positionsQuery[:len(positionsQuery)-1] + ";"
-
-	err := s.pool.QueryRow(ctx, `
-		INSERT INTO sales (manager_id, customer_id) VALUES ($1, $2)
-		RETURNING id, created
-		`, sale.Manager_id, sale.Customer_id).Scan(&sale.ID, &sale.Created)
-	if err != nil {
-		log.Print(err)
-		return nil, ErrInternal
-	}
 	_, err = s.pool.Exec(ctx, positionsQuery)
 	if err != nil {
 		log.Print(err)
